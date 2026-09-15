@@ -371,22 +371,42 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
     return normalizeForSpeech(out);
   }
 
-  /* מפצל מקטע למשפטים קצרים — הקראה ארוכה מדי נקטעת בחלק מהדפדפנים */
+  /* מחלק את המקטע לאמירות של עד ~220 תווים.
+     כל אמירה נפרדת גוררת הפסקה ואיפוס אינטונציה אצל מנוע הדיבור, ולכן
+     משפט קצר לכל אמירה נשמע קצוץ. מאחדים משפטים עד לאורך סביר, ומפצלים
+     רק כשאין ברירה — לעולם לא באמצע מילה.
+     הנקודתיים אינה סוף משפט: בטקסט הזה היא פותחת רשימה ("אחת:", "הכלל:"),
+     ופיצול עליה ייצר אמירות באורך מילה אחת. */
   function chunk(text) {
+    var MAX = 220, MIN = 90;
+
     // פיצול למשפטים בלי lookbehind, שאינו נתמך בגרסאות Safari ישנות
-    var parts = text.replace(/([.!?:…])\s+/g, "$1\u0000").split("\u0000");
-    var out = [];
-    parts.forEach(function (p) {
-      p = p.trim();
-      if (!p) return;
-      while (p.length > 240) {
-        var cut = p.lastIndexOf(",", 240);
-        if (cut < 80) cut = 240;
-        out.push(p.slice(0, cut + 1).trim());
-        p = p.slice(cut + 1).trim();
+    var sentences = text.replace(/([.!?…])\s+/g, "$1\u0001").split("\u0001");
+    var pieces = [];
+
+    sentences.forEach(function (raw) {
+      var s = raw.trim();
+      if (!s) return;
+      while (s.length > MAX) {
+        var cut = s.lastIndexOf(",", MAX);
+        if (cut < MIN) cut = s.lastIndexOf(" ", MAX);
+        if (cut < MIN) cut = MAX;
+        pieces.push(s.slice(0, cut + 1).trim());
+        s = s.slice(cut + 1).trim();
       }
-      if (p) out.push(p);
+      if (s) pieces.push(s);
     });
+
+    var out = [];
+    pieces.forEach(function (piece) {
+      var last = out.length - 1;
+      if (last >= 0 && out[last].length + 1 + piece.length <= MAX) {
+        out[last] += " " + piece;
+      } else {
+        out.push(piece);
+      }
+    });
+
     return out.length ? out : [text];
   }
 
