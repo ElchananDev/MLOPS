@@ -1,11 +1,11 @@
 [
  {
-  "term": "Training serving skew",
-  "say": "טריינינג סרווינג סקיו"
- },
- {
   "term": "Point in time correctness",
   "say": "פוינט אין טיים קורקטנס"
+ },
+ {
+  "term": "Training serving skew",
+  "say": "טריינינג סרווינג סקיו"
  },
  {
   "term": "Gradient Boosting",
@@ -16,24 +16,24 @@
   "say": "רולינג אפדייט"
  },
  {
-  "term": "Feature Store",
-  "say": "פיצ׳ר סטור"
+  "term": "Delayed labels",
+  "say": "דילייד לייבלס"
  },
  {
-  "term": "Data Leakage",
-  "say": "דאטה ליקג׳"
+  "term": "Generalization",
+  "say": "ג'נרלייזיישן"
+ },
+ {
+  "term": "Feature Store",
+  "say": "פיצ'ר סטור"
  },
  {
   "term": "Concept drift",
   "say": "קונספט דריפט"
  },
  {
-  "term": "Delayed labels",
-  "say": "דילייד לייבלס"
- },
- {
-  "term": "Generalization",
-  "say": "ג׳נרלייזיישן"
+  "term": "Data Leakage",
+  "say": "דאטה ליקג'"
  },
  {
   "term": "Tokenization",
@@ -48,6 +48,14 @@
   "say": "קליברציה"
  },
  {
+  "term": "MemoryError",
+  "say": "ממורי ארור"
+ },
+ {
+  "term": "Fine tuning",
+  "say": "פיין טיונינג"
+ },
+ {
   "term": "Kubernetes",
   "say": "קוברנטיס"
  },
@@ -56,20 +64,12 @@
   "say": "אמבדינגס"
  },
  {
-  "term": "MemoryError",
-  "say": "ממורי-ארור"
- },
- {
-  "term": "Fine tuning",
-  "say": "פיין-טיונינג"
- },
- {
   "term": "Data drift",
   "say": "דאטה דריפט"
  },
  {
   "term": "Blue Green",
-  "say": "בלו-גרין"
+  "say": "בלו גרין"
  },
  {
   "term": "Validation",
@@ -78,10 +78,6 @@
  {
   "term": "Terraform",
   "say": "טרהפורם"
- },
- {
-  "term": "Kubeflow",
-  "say": "קיובפלואו"
  },
  {
   "term": "Streaming",
@@ -93,7 +89,7 @@
  },
  {
   "term": "Precision",
-  "say": "פרסיז׳ן"
+  "say": "פרסיז'ן"
  },
  {
   "term": "Inference",
@@ -102,6 +98,10 @@
  {
   "term": "Readiness",
   "say": "רדינס"
+ },
+ {
+  "term": "Kubeflow",
+  "say": "קיובפלואו"
  },
  {
   "term": "Liveness",
@@ -120,10 +120,6 @@
   "say": "נוטבוק"
  },
  {
-  "term": "Startup",
-  "say": "סטארטאפ"
- },
- {
   "term": "Accuracy",
   "say": "אקיורסי"
  },
@@ -132,16 +128,28 @@
   "say": "רולבק"
  },
  {
+  "term": "Engineer",
+  "say": "אנג'יניר"
+ },
+ {
+  "term": "Startup",
+  "say": "סטארטאפ"
+ },
+ {
   "term": "Airflow",
   "say": "אירפלואו"
  },
  {
-  "term": "GitHub",
-  "say": "גיטהאב"
+  "term": "Feature",
+  "say": "פיצ'ר"
  },
  {
-  "term": "Feature",
-  "say": "פיצ׳ר"
+  "term": "install",
+  "say": "אינסטול"
+ },
+ {
+  "term": "GitHub",
+  "say": "גיטהאב"
  },
  {
   "term": "Python",
@@ -172,6 +180,34 @@
   "say": "פנדס"
  },
  {
+  "term": "UPSERT",
+  "say": "אפסרט"
+ },
+ {
+  "term": "INSERT",
+  "say": "אינסרט"
+ },
+ {
+  "term": "prompt",
+  "say": "פרומפט"
+ },
+ {
+  "term": "TF-IDF",
+  "say": "טי אף איי די אף"
+ },
+ {
+  "term": "status",
+  "say": "סטטוס"
+ },
+ {
+  "term": "commit",
+  "say": "קומיט"
+ },
+ {
+  "term": "python",
+  "say": "פייתון"
+ },
+ {
   "term": "Spark",
   "say": "ספארק"
  },
@@ -185,11 +221,11 @@
  },
  {
   "term": "Batch",
-  "say": "באטץ׳"
+  "say": "באטץ'"
  },
  {
   "term": "Image",
-  "say": "אימג׳"
+  "say": "אימג'"
  },
  {
   "term": "Train",
@@ -200,32 +236,20 @@
   "say": "דריפט"
  },
  {
-  "term": "UPSERT",
-  "say": "אפסרט"
- },
- {
-  "term": "INSERT",
-  "say": "אינסרט"
- },
- {
-  "term": "prompt",
-  "say": "פרומפט"
- },
- {
   "term": "MLOps",
-  "say": "אם-אל-אופס"
+  "say": "אם אל אופס"
  },
  {
-  "term": "TF-IDF",
-  "say": "טי-אף-איי-די-אף"
+  "term": "Linux",
+  "say": "לינוקס"
  },
  {
   "term": "RMSE",
-  "say": "אר-אם-אס-אי"
+  "say": "אר אם אס אי"
  },
  {
   "term": "JOIN",
-  "say": "ג׳וין"
+  "say": "ג'וין"
  },
  {
   "term": "Test",
@@ -265,19 +289,19 @@
  },
  {
   "term": "MAE",
-  "say": "אם-איי-אי"
+  "say": "אם איי אי"
  },
  {
   "term": "SQL",
-  "say": "אס-קיו-אל"
+  "say": "אס קיו אל"
  },
  {
   "term": "API",
-  "say": "איי-פי-איי"
+  "say": "איי פי איי"
  },
  {
   "term": "GPU",
-  "say": "ג׳י-פי-יו"
+  "say": "ג'י פי יו"
  },
  {
   "term": "RAM",
@@ -297,54 +321,46 @@
  },
  {
   "term": "p95",
-  "say": "פי-תשעים-וחמש"
+  "say": "פי תשעים וחמש"
  },
  {
   "term": "p99",
-  "say": "פי-תשעים-ותשע"
+  "say": "פי תשעים ותשע"
  },
  {
   "term": "A/B",
-  "say": "איי-בי"
- },
- {
-  "term": "CI",
-  "say": "סי-איי"
- },
- {
-  "term": "CD",
-  "say": "סי-די"
- },
- {
-  "term": "CT",
-  "say": "סי-טי"
- },
- {
-  "term": "ML",
-  "say": "אם-אל"
- },
- {
-  "term": "ls",
-  "say": "אל-אס"
+  "say": "איי בי"
  },
  {
   "term": "pwd",
-  "say": "פי-דאבליו-די"
- },
- {
-  "term": "install",
-  "say": "אינסטול"
- },
- {
-  "term": "status",
-  "say": "סטטוס"
- },
- {
-  "term": "commit",
-  "say": "קומיט"
+  "say": "פי דאבליו די"
  },
  {
   "term": "add",
   "say": "אד"
+ },
+ {
+  "term": "git",
+  "say": "גיט"
+ },
+ {
+  "term": "CI",
+  "say": "סי איי"
+ },
+ {
+  "term": "CD",
+  "say": "סי די"
+ },
+ {
+  "term": "CT",
+  "say": "סי טי"
+ },
+ {
+  "term": "ML",
+  "say": "אם אל"
+ },
+ {
+  "term": "ls",
+  "say": "אל אס"
  }
 ]

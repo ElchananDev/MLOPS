@@ -41,11 +41,22 @@ def load_pronunciation() -> list[tuple[str, str]]:
     return [(item["term"], item["say"]) for item in raw]
 
 
+PREFIX = r"(^|\s)(וה|מה|כש|שה|לכ|[הובלמכשד])-(?=[\u05d0-\u05ea])"
+
+
+def normalize_for_speech(text: str) -> str:
+    """אחרי התעתיק, מקף בין אותיות עבריות רק גורם למנוע לעצור באמצע מילה."""
+    text = text.replace("\u05f3", "'")
+    text = re.sub(PREFIX, r"\1\2", text)
+    text = re.sub(r"([\u05d0-\u05ea])-(?=[\u05d0-\u05ea])", r"\1 ", text)
+    return re.sub(r" {2,}", " ", text)
+
+
 def to_spoken(text: str, table: list[tuple[str, str]]) -> str:
     """ממיר מונחים באנגלית לכתיב עברי, כדי שקול עברי יהגה אותם נכון."""
     for term, say in table:
         text = re.sub(rf"(^|[^A-Za-z]){re.escape(term)}(?![A-Za-z])", rf"\1{say}", text)
-    return text
+    return normalize_for_speech(text)
 
 
 def split_for_api(text: str) -> list[str]:
