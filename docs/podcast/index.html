@@ -347,7 +347,8 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
 
   /* מפצל מקטע למשפטים קצרים — הקראה ארוכה מדי נקטעת בחלק מהדפדפנים */
   function chunk(text) {
-    var parts = text.split(/(?<=[.!?:…])\s+/);
+    // פיצול למשפטים בלי lookbehind, שאינו נתמך בגרסאות Safari ישנות
+    var parts = text.replace(/([.!?:…])\s+/g, "$1\u0000").split("\u0000");
     var out = [];
     parts.forEach(function (p) {
       p = p.trim();
@@ -370,7 +371,8 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
 
   /* ---------------------------- state ---------------------------- */
   var st = { ep: 0, seg: 0, playing: false, chunks: [], ci: 0, stopping: false };
-  var voices = [], voice = null, rate = 1, autoNext = true, done = {};
+  var allVoices = [], voices = [], voice = null, rate = 1, autoNext = true, done = {};
+  var lastError = "";
 
   function load() {
     try {
@@ -399,51 +401,146 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   /* ---------------------------- voices ---------------------------- */
   function isHebrew(v) { return /^(he|iw)/i.test(v.lang || ""); }
 
+  function pool() {
+    // קולות עבריים תחילה, ואחריהם כל השאר — כדי שתמיד יהיה במה לנסות
+    return voices.concat(allVoices.filter(function (v) { return !isHebrew(v); }));
+  }
+
   function loadVoices() {
-    voices = (synth.getVoices() || []).filter(isHebrew);
+    allVoices = synth.getVoices() || [];
+    voices = allVoices.filter(isHebrew);
+
+    var list = pool();
     var sel = document.getElementById("voiceSel");
     var wanted = typeof voice === "string" ? voice : (voice && voice.name);
 
     sel.innerHTML = "";
-    voices.forEach(function (v, i) {
+    list.forEach(function (v, i) {
       var o = document.createElement("option");
       o.value = String(i);
-      o.textContent = v.name + (v.localService ? "" : " (ענן)");
+      o.textContent = v.name + (isHebrew(v) ? " · עברית" : " · " + (v.lang || "")) +
+                      (v.localService ? "" : " (ענן)");
       sel.appendChild(o);
     });
 
-    if (voices.length) {
+    if (list.length) {
       var idx = 0;
-      voices.forEach(function (v, i) { if (v.name === wanted) idx = i; });
+      list.forEach(function (v, i) { if (v.name === wanted) idx = i; });
       sel.value = String(idx);
-      voice = voices[idx];
+      voice = list[idx];
       document.getElementById("settings").hidden = false;
     }
     renderNotice();
   }
 
+  function setStatus(kind, text) {
+    var el = document.getElementById("testStatus");
+    if (!el) return;
+    el.textContent = text;
+    el.style.color = kind === "ok" ? "var(--ok)" : kind === "bad" ? "var(--warn)" : "var(--muted)";
+  }
+
+  /* משמיע משפט קצר ומדווח בדיוק מה הדפדפן החזיר */
+  function testVoice() {
+    if (!synth) { setStatus("bad", "אין תמיכה בהקראה בדפדפן הזה."); return; }
+    loadVoices();
+    setStatus("", "מנסה…");
+
+    var u = new SpeechSynthesisUtterance("שלום. זו בדיקת קול. אם אתה שומע את המשפט הזה, הכול עובד.");
+    try { if (voice) u.voice = voice; } catch (e) {}
+    u.lang = (voice && voice.lang) || "he-IL";
+    u.rate = rate;
+
+    var started = false;
+    u.onstart = function () { started = true; setStatus("ok", "יש קול — אמור להישמע עכשיו."); };
+    u.onerror = function (e) {
+      lastError = e.error || "unknown";
+      setStatus("bad", "הדפדפן החזיר שגיאה: " + lastError + ". נסה קול אחר ברשימה, או דפדפן אחר.");
+    };
+    u.onend = function () { if (started) setStatus("ok", "הבדיקה הסתיימה. אפשר להתחיל פרק."); };
+
+    try { synth.cancel(); synth.speak(u); }
+    catch (e) { setStatus("bad", "הקריאה להקראה נכשלה: " + e.message); return; }
+
+    setTimeout(function () {
+      if (!started) {
+        setStatus("bad", "לא התקבלה תגובה ממנוע הדיבור. הסיבה הנפוצה: הדף פתוח בתוך " +
+          "תצוגה מוטמעת. שמור את הקובץ והפעל אותו ישירות בדפדפן.");
+      }
+    }, 2200);
+  }
+
+  function diagnostics() {
+    var framed = false;
+    try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    var rows = [
+      ["תמיכה בהקראה", synth ? "קיימת" : "לא קיימת"],
+      ["קולות במכשיר", String(allVoices.length)],
+      ["מתוכם בעברית", String(voices.length)],
+      ["קול נבחר", voice ? (voice.name + " · " + (voice.lang || "")) : "אין"],
+      ["הדף בתוך מסגרת", framed ? "כן — זו כנראה הבעיה" : "לא"],
+      ["כתובת", location.protocol],
+      ["שגיאה אחרונה", lastError || "אין"]
+    ];
+    return '<details style="margin-top:10px"><summary style="cursor:pointer;font-size:13.5px;' +
+      'font-weight:700">מה הדפדפן מדווח</summary><div style="font-size:13.5px;margin-top:8px">' +
+      rows.map(function (r) {
+        return '<div style="display:flex;gap:8px"><b style="min-width:9.5em">' + r[0] +
+               '</b><span>' + r[1] + "</span></div>";
+      }).join("") + "</div></details>";
+  }
+
+  function framedWarning() {
+    var framed = false;
+    try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    if (!framed) return "";
+    return '<div class="notice"><b>הדף פתוח בתוך תצוגה מוטמעת</b>' +
+      '<p style="margin:0">רוב הדפדפנים חוסמים הקראה במצב הזה. הורד את הקובץ ' +
+      '<code>index.html</code> ופתח אותו ישירות בדפדפן — בלחיצה כפולה על הקובץ.</p></div>';
+  }
+
+  function wireNotice() {
+    var btn = document.getElementById("testBtn");
+    if (btn) btn.addEventListener("click", testVoice);
+  }
+
   function renderNotice() {
     var box = document.getElementById("voiceNotice");
+    var framed = framedWarning();
+    var tail = '<div class="rowbar" style="margin:12px 0 0">' +
+      '<button class="ghost" id="testBtn" type="button">▶ בדיקת קול</button>' +
+      '<span id="testStatus" style="font-size:13.5px;color:var(--muted)"></span></div>' +
+      diagnostics();
+
     if (!synth) {
-      box.innerHTML = '<div class="notice"><b>הדפדפן הזה לא תומך בהקראה</b>' +
-        '<p style="margin:0">אפשר לקרוא את התמלול המלא כאן למטה, או לפתוח את הדף ב-Chrome, ב-Edge או ב-Safari.</p></div>';
+      box.innerHTML = framed + '<div class="notice"><b>הדפדפן הזה לא תומך בהקראה</b>' +
+        '<p style="margin:0">אפשר לקרוא את התמלול המלא כאן למטה, או לפתוח את הדף ב-Chrome, ב-Edge או ב-Safari.</p>' +
+        tail + "</div>";
+      wireNotice();
       return;
     }
     if (!voices.length) {
-      box.innerHTML = '<div class="notice"><b>לא נמצא קול עברי במכשיר הזה</b>' +
+      box.innerHTML = framed + '<div class="notice"><b>לא נמצא קול עברי במכשיר הזה</b>' +
         '<p style="margin:0 0 6px">התמלול המלא זמין כאן למטה. כדי לשמוע הקראה, הוסף קול עברי — זו הגדרה במערכת, לא התקנה של תוכנה:</p>' +
         '<ul>' +
         '<li><b>Windows:</b> הגדרות ← שעה ושפה ← שפה ואזור ← הוספת שפה ← עברית, ולסמן “דיבור”. ואז לפתוח את הדף ב-Edge.</li>' +
         '<li><b>macOS / iPhone:</b> הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית (Carmit).</li>' +
         '<li><b>Android:</b> הגדרות ← נגישות ← פלט טקסט לדיבור ← Google ← התקנת נתוני קול ← עברית.</li>' +
-        '</ul></div>';
+        '</ul>' +
+        (allVoices.length
+          ? '<p style="margin:8px 0 0">בינתיים אפשר לנסות אחד מ-' + allVoices.length +
+            ' הקולות האחרים שנמצאו — הם יקראו עברית בהגייה זרה, אבל יישמעו.</p>'
+          : "") +
+        tail + "</div>";
+      wireNotice();
       return;
     }
     var cloud = voices.some(function (v) { return !v.localService; });
-    box.innerHTML = '<div class="notice ok"><b>מוכן להאזנה — נמצאו ' + voices.length + ' קולות בעברית</b>' +
+    box.innerHTML = framed + '<div class="notice ok"><b>מוכן להאזנה — נמצאו ' + voices.length + ' קולות בעברית</b>' +
       '<p style="margin:0">לחץ על פרק כדי לפתוח אותו, ואז על כפתור הנגינה. אפשר גם ללחוץ על כל פסקה כדי להתחיל ממנה.' +
       (cloud ? ' קול המסומן “ענן” מסונתז אצל ספק הדפדפן, כלומר הטקסט נשלח אליו; קול ללא הסימון עובד מקומית ובלי רשת.' : ' הקולות כאן מקומיים — ההקראה עובדת גם בלי חיבור לרשת.') +
-      '</p></div>';
+      '</p>' + tail + "</div>";
+    wireNotice();
   }
 
   /* ---------------------------- render ---------------------------- */
@@ -528,7 +625,7 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   }
 
   function speak() {
-    if (!voices.length) return;
+    if (!allVoices.length) loadVoices();
     var text = DATA[st.ep].segments[st.seg][1];
     st.chunks = chunk(toSpoken(text));
     st.ci = 0;
@@ -547,16 +644,33 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
     u.rate = rate;
     u.pitch = 1;
 
+    var started = false;
+    u.onstart = function () { started = true; };
     u.onend = function () {
       if (!st.playing || st.stopping) return;
       st.ci++;
       sayChunk();
     };
     u.onerror = function (e) {
+      lastError = e.error || "unknown";
       if (!st.playing || st.stopping || e.error === "interrupted" || e.error === "canceled") return;
       st.ci++;
       sayChunk();
     };
+
+    // אם מנוע הדיבור לא הגיב כלל, אומרים את זה במקום להשתתק
+    if (st.ci === 0) {
+      setTimeout(function () {
+        if (!started && st.playing && !synth.speaking) {
+          st.playing = false;
+          updateBar();
+          renderNotice();
+          setStatus("bad", "לחצת נגן אבל מנוע הדיבור לא הגיב. פרטים בקטע “מה הדפדפן מדווח”.");
+          var box = document.getElementById("voiceNotice");
+          if (box) box.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 2500);
+    }
 
     try { synth.speak(u); } catch (e) {}
   }
@@ -600,7 +714,8 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   }
 
   function toggle() {
-    if (!voices.length) { renderNotice(); return; }
+    if (!synth) { renderNotice(); return; }
+    if (!allVoices.length) loadVoices();
     if (st.playing) {
       st.playing = false;
       stopSpeech();
@@ -644,7 +759,8 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   document.getElementById("nextBtn").addEventListener("click", function () { step(1); });
 
   document.getElementById("voiceSel").addEventListener("change", function (e) {
-    voice = voices[parseInt(e.target.value, 10)] || voices[0];
+    var list = pool();
+    voice = list[parseInt(e.target.value, 10)] || list[0];
     save();
     if (st.playing) { stopSpeech(); speak(); }
   });
