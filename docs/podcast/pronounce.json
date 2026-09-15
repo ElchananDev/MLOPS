@@ -1,0 +1,350 @@
+[
+ {
+  "term": "Training serving skew",
+  "say": "טריינינג סרווינג סקיו"
+ },
+ {
+  "term": "Point in time correctness",
+  "say": "פוינט אין טיים קורקטנס"
+ },
+ {
+  "term": "Gradient Boosting",
+  "say": "גרדיאנט בוסטינג"
+ },
+ {
+  "term": "Rolling update",
+  "say": "רולינג אפדייט"
+ },
+ {
+  "term": "Feature Store",
+  "say": "פיצ׳ר סטור"
+ },
+ {
+  "term": "Data Leakage",
+  "say": "דאטה ליקג׳"
+ },
+ {
+  "term": "Concept drift",
+  "say": "קונספט דריפט"
+ },
+ {
+  "term": "Delayed labels",
+  "say": "דילייד לייבלס"
+ },
+ {
+  "term": "Generalization",
+  "say": "ג׳נרלייזיישן"
+ },
+ {
+  "term": "Tokenization",
+  "say": "טוקניזציה"
+ },
+ {
+  "term": "Idempotency",
+  "say": "אידמפוטנטיות"
+ },
+ {
+  "term": "Calibration",
+  "say": "קליברציה"
+ },
+ {
+  "term": "Kubernetes",
+  "say": "קוברנטיס"
+ },
+ {
+  "term": "Embeddings",
+  "say": "אמבדינגס"
+ },
+ {
+  "term": "MemoryError",
+  "say": "ממורי-ארור"
+ },
+ {
+  "term": "Fine tuning",
+  "say": "פיין-טיונינג"
+ },
+ {
+  "term": "Data drift",
+  "say": "דאטה דריפט"
+ },
+ {
+  "term": "Blue Green",
+  "say": "בלו-גרין"
+ },
+ {
+  "term": "Validation",
+  "say": "ולידיישן"
+ },
+ {
+  "term": "Terraform",
+  "say": "טרהפורם"
+ },
+ {
+  "term": "Kubeflow",
+  "say": "קיובפלואו"
+ },
+ {
+  "term": "Streaming",
+  "say": "סטרימינג"
+ },
+ {
+  "term": "Container",
+  "say": "קונטיינר"
+ },
+ {
+  "term": "Precision",
+  "say": "פרסיז׳ן"
+ },
+ {
+  "term": "Inference",
+  "say": "אינפרנס"
+ },
+ {
+  "term": "Readiness",
+  "say": "רדינס"
+ },
+ {
+  "term": "Liveness",
+  "say": "לייבנס"
+ },
+ {
+  "term": "Baseline",
+  "say": "בייסליין"
+ },
+ {
+  "term": "Pipeline",
+  "say": "פייפליין"
+ },
+ {
+  "term": "Notebook",
+  "say": "נוטבוק"
+ },
+ {
+  "term": "Startup",
+  "say": "סטארטאפ"
+ },
+ {
+  "term": "Accuracy",
+  "say": "אקיורסי"
+ },
+ {
+  "term": "Rollback",
+  "say": "רולבק"
+ },
+ {
+  "term": "Airflow",
+  "say": "אירפלואו"
+ },
+ {
+  "term": "GitHub",
+  "say": "גיטהאב"
+ },
+ {
+  "term": "Feature",
+  "say": "פיצ׳ר"
+ },
+ {
+  "term": "Python",
+  "say": "פייתון"
+ },
+ {
+  "term": "Recall",
+  "say": "ריקול"
+ },
+ {
+  "term": "Docker",
+  "say": "דוקר"
+ },
+ {
+  "term": "Canary",
+  "say": "קנרי"
+ },
+ {
+  "term": "Shadow",
+  "say": "שאדו"
+ },
+ {
+  "term": "Sample",
+  "say": "סמפל"
+ },
+ {
+  "term": "pandas",
+  "say": "פנדס"
+ },
+ {
+  "term": "Spark",
+  "say": "ספארק"
+ },
+ {
+  "term": "Kafka",
+  "say": "קפקא"
+ },
+ {
+  "term": "Label",
+  "say": "לייבל"
+ },
+ {
+  "term": "Batch",
+  "say": "באטץ׳"
+ },
+ {
+  "term": "Image",
+  "say": "אימג׳"
+ },
+ {
+  "term": "Train",
+  "say": "טריין"
+ },
+ {
+  "term": "drift",
+  "say": "דריפט"
+ },
+ {
+  "term": "UPSERT",
+  "say": "אפסרט"
+ },
+ {
+  "term": "INSERT",
+  "say": "אינסרט"
+ },
+ {
+  "term": "prompt",
+  "say": "פרומפט"
+ },
+ {
+  "term": "MLOps",
+  "say": "אם-אל-אופס"
+ },
+ {
+  "term": "TF-IDF",
+  "say": "טי-אף-איי-די-אף"
+ },
+ {
+  "term": "RMSE",
+  "say": "אר-אם-אס-אי"
+ },
+ {
+  "term": "JOIN",
+  "say": "ג׳וין"
+ },
+ {
+  "term": "Test",
+  "say": "טסט"
+ },
+ {
+  "term": "venv",
+  "say": "ונב"
+ },
+ {
+  "term": "seed",
+  "say": "סיד"
+ },
+ {
+  "term": "bias",
+  "say": "באיאס"
+ },
+ {
+  "term": "root",
+  "say": "רוט"
+ },
+ {
+  "term": "grep",
+  "say": "גרפ"
+ },
+ {
+  "term": "head",
+  "say": "הד"
+ },
+ {
+  "term": "tail",
+  "say": "טייל"
+ },
+ {
+  "term": "init",
+  "say": "איניט"
+ },
+ {
+  "term": "MAE",
+  "say": "אם-איי-אי"
+ },
+ {
+  "term": "SQL",
+  "say": "אס-קיו-אל"
+ },
+ {
+  "term": "API",
+  "say": "איי-פי-איי"
+ },
+ {
+  "term": "GPU",
+  "say": "ג׳י-פי-יו"
+ },
+ {
+  "term": "RAM",
+  "say": "ראם"
+ },
+ {
+  "term": "RAG",
+  "say": "ראג"
+ },
+ {
+  "term": "Git",
+  "say": "גיט"
+ },
+ {
+  "term": "pip",
+  "say": "פיפ"
+ },
+ {
+  "term": "p95",
+  "say": "פי-תשעים-וחמש"
+ },
+ {
+  "term": "p99",
+  "say": "פי-תשעים-ותשע"
+ },
+ {
+  "term": "A/B",
+  "say": "איי-בי"
+ },
+ {
+  "term": "CI",
+  "say": "סי-איי"
+ },
+ {
+  "term": "CD",
+  "say": "סי-די"
+ },
+ {
+  "term": "CT",
+  "say": "סי-טי"
+ },
+ {
+  "term": "ML",
+  "say": "אם-אל"
+ },
+ {
+  "term": "ls",
+  "say": "אל-אס"
+ },
+ {
+  "term": "pwd",
+  "say": "פי-דאבליו-די"
+ },
+ {
+  "term": "install",
+  "say": "אינסטול"
+ },
+ {
+  "term": "status",
+  "say": "סטטוס"
+ },
+ {
+  "term": "commit",
+  "say": "קומיט"
+ },
+ {
+  "term": "add",
+  "say": "אד"
+ }
+]
