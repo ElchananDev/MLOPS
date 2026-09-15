@@ -398,7 +398,7 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   /* ---------------------------- state ---------------------------- */
   var st = { ep: 0, seg: 0, playing: false, chunks: [], ci: 0, stopping: false };
   var allVoices = [], voices = [], voice = null, rate = 1, autoNext = true, done = {};
-  var lastError = "";
+  var lastError = "", foreignOk = false;
 
   function load() {
     try {
@@ -457,6 +457,7 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
       document.getElementById("settings").hidden = false;
     }
     renderNotice();
+    updateBar();   // הקולות נטענים אחרי הציור הראשון; בלי זה הסרגל נשאר "אין קול"
   }
 
   function setStatus(kind, text) {
@@ -525,16 +526,62 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
       '<code>index.html</code> ופתח אותו ישירות בדפדפן — בלחיצה כפולה על הקובץ.</p></div>';
   }
 
+  function foreignWarning() {
+    if (!voice || isHebrew(voice) || foreignOk) return "";
+    return '<div class="notice"><b>הקול הנבחר אינו עברי — אל תנגן כך</b>' +
+      '<p style="margin:0 0 8px">הקול הנוכחי הוא <b>' + voice.name + "</b> (" + (voice.lang || "") +
+      '). קול כזה מקריא אותיות עבריות לפי כללי ההגייה של שפתו, והתוצאה אינה מבטא זר — ' +
+      'היא רצף הברות חסר פשר. זו כמעט בוודאות הסיבה שמה שאתה שומע אינו נשמע כמו עברית.</p>' +
+      '<p style="margin:0 0 8px">הפתרון הוא להוסיף קול עברי במערכת ההפעלה (ההוראות למטה), ' +
+      'או לפתוח את הדף ב-Edge, שבו יש קולות עבריים איכותיים.</p>' +
+      '<button class="ghost" id="anywayBtn" type="button">אני מבין, נגן בכל זאת</button></div>';
+  }
+
   function wireNotice() {
     var btn = document.getElementById("testBtn");
     if (btn) btn.addEventListener("click", testVoice);
+
+    var anyway = document.getElementById("anywayBtn");
+    if (anyway) anyway.addEventListener("click", function () {
+      foreignOk = true;
+      renderNotice();
+      st.playing = true;
+      updateBar();
+      speak();
+    });
+
+    var copy = document.getElementById("copyDiagBtn");
+    if (copy) copy.addEventListener("click", function () {
+      var text = diagnosticsText();
+      var done = function () { copy.textContent = "הועתק"; setTimeout(function () {
+        copy.textContent = "העתקת הפרטים"; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+      else { window.prompt("העתק את הטקסט הזה:", text); }
+    });
+  }
+
+  function diagnosticsText() {
+    var framed = false;
+    try { framed = window.self !== window.top; } catch (e) { framed = true; }
+    return [
+      "קולות במכשיר: " + allVoices.length,
+      "קולות בעברית: " + voices.length,
+      "רשימת הקולות העבריים: " + (voices.map(function (v) {
+        return v.name + " (" + v.lang + (v.localService ? ", מקומי" : ", ענן") + ")";
+      }).join(" | ") || "אין"),
+      "קול נבחר: " + (voice ? voice.name + " / " + voice.lang : "אין"),
+      "בתוך מסגרת: " + (framed ? "כן" : "לא"),
+      "שגיאה אחרונה: " + (lastError || "אין"),
+      "דפדפן: " + navigator.userAgent
+    ].join("\n");
   }
 
   function renderNotice() {
     var box = document.getElementById("voiceNotice");
-    var framed = framedWarning();
+    var framed = framedWarning() + foreignWarning();
     var tail = '<div class="rowbar" style="margin:12px 0 0">' +
       '<button class="ghost" id="testBtn" type="button">▶ בדיקת קול</button>' +
+      '<button class="ghost" id="copyDiagBtn" type="button">העתקת הפרטים</button>' +
       '<span id="testStatus" style="font-size:13.5px;color:var(--muted)"></span></div>' +
       diagnostics();
 
@@ -629,9 +676,12 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   function updateBar() {
     var ep = DATA[st.ep];
     document.getElementById("nowTitle").textContent = "פרק " + ep.n + " · " + ep.title;
+    var voiceNote = voice
+      ? " · " + (isHebrew(voice) ? "קול: " + voice.name : "⚠ קול לא עברי: " + voice.name)
+      : " · אין קול";
     document.getElementById("nowSub").textContent =
       "מקטע " + (st.seg + 1) + " מתוך " + ep.segments.length +
-      " · " + (LABEL[ep.segments[st.seg][0]] || "");
+      " · " + (LABEL[ep.segments[st.seg][0]] || "") + voiceNote;
     document.getElementById("progBar").style.width =
       (((st.seg + 1) / ep.segments.length) * 100).toFixed(1) + "%";
     document.getElementById("prevBtn").disabled = (st.ep === 0 && st.seg === 0);
@@ -742,6 +792,16 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   function toggle() {
     if (!synth) { renderNotice(); return; }
     if (!allVoices.length) loadVoices();
+
+    // קול שאינו עברי יקריא אותיות עבריות בהגייה של שפה אחרת — התוצאה
+    // אינה "מבטא זר", היא בלתי מובנת. לא מנגנים כך בלי אישור מפורש.
+    if (!st.playing && voice && !isHebrew(voice) && !foreignOk) {
+      renderNotice();
+      var box = document.getElementById("voiceNotice");
+      if (box) box.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
     if (st.playing) {
       st.playing = false;
       stopSpeech();
@@ -787,6 +847,8 @@ h2.sec{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--m
   document.getElementById("voiceSel").addEventListener("change", function (e) {
     var list = pool();
     voice = list[parseInt(e.target.value, 10)] || list[0];
+    foreignOk = false;
+    renderNotice();
     save();
     if (st.playing) { stopSpeech(); speak(); }
   });
