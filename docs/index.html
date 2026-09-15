@@ -2769,7 +2769,13 @@ print(example_prediction)</code></pre></figure>
         a.innerHTML = '<span class="n">' + num + "</span> " + title;
         li.appendChild(a);
         toc.appendChild(li);
-        links.push({ a: a, li: li, id: node.id, text: (num + " " + title).toLowerCase() });
+        // מחפשים גם בגוף הפרק, לא רק בכותרת: מי שמקליד "דליפה" מצפה למצוא
+        // את הפרק על נתונים, גם אם המילה לא מופיעה בכותרת שלו.
+        var body = (node.textContent || "").replace(/\s+/g, " ");
+        links.push({
+          a: a, li: li, id: node.id,
+          text: (num + " " + title + " " + body).toLowerCase()
+        });
       }
     });
   }
