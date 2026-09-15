@@ -205,3 +205,8 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Lab outputs (regenerate with: python train.py)
+labs/**/artifacts/
+labs/**/mlruns/
+labs/**/mlflow.db
